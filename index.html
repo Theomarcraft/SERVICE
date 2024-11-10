@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Servicios Públicos - UNIR S.A.</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9fafb;
+            color: #333;
+            text-align: center;
+            padding: 30px;
+            margin: 0;
+        }
+        h1 {
+            color: #2a9d8f;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        h3 {
+            color: #264653;
+            margin-top: 20px;
+            font-size: 1.6em;
+        }
+        button {
+            padding: 12px 25px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            border: none;
+            transition: all 0.3s ease;
+            color: white;
+            font-weight: bold;
+            width: 200px;
+            margin-top: 20px;
+        }
+        button:hover {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+        button[onclick*="agua"] {
+            background-color: #457b9d;
+        }
+        button[onclick*="gas"] {
+            background-color: #e76f51;
+        }
+        button[onclick*="energia"] {
+            background-color: #f4a261;
+        }
+        .action-buttons button {
+            background-color: #2a9d8f;
+            margin: 10px 5px;
+        }
+        button[disabled] {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+        label {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 15px;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="password"],
+        select {
+            padding: 12px;
+            margin: 10px 0 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            width: 100%;
+            max-width: 350px;
+            font-size: 1.1em;
+            text-align: center;
+        }
+        #resultado {
+            background-color: #e9ecef;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 30px;
+            display: none;
+            color: #333;
+            text-align: left;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #resultado h3 {
+            color: #2a9d8f;
+        }
+        #pago {
+            background-color: #f9fafb;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            margin-top: 30px;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #confirmacionPago {
+            font-size: 1.5em;
+            color: #28a745;
+            font-weight: bold;
+            margin-top: 20px;
+            display: none;
+        }
+        select {
+            font-size: 1.1em;
+            padding: 10px;
+        }
+        #camposPago {
+            margin-top: 20px;
+            display: none;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            button {
+                width: 100%;
+                margin: 10px 0;
+            }
+            #pago select, 
+            #camposPago input {
+                width: 100%;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>UNIR S.A. - Sistema de Servicios Públicos</h1>
+    <div>
+        <h3>Seleccione el servicio:</h3>
+        <button onclick="seleccionarServicio('agua')">Agua</button>
+        <button onclick="seleccionarServicio('gas')">Gas</button>
+        <button onclick="seleccionarServicio('energia')">Energía</button>
+    </div>
+    <div>
+        <h3>Datos del Recibo</h3>
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" placeholder="Ingresa tu nombre"><br>
+        <label for="referencia">Referencia del Recibo:</label>
+        <input type="text" id="referencia" placeholder="Ej: 123456"><br>
+        <label for="consumo">Consumo:</label>
+        <input type="number" id="consumo" placeholder="Ej: 100"><br>
+    </div>
+    <div class="action-buttons">
+        <button onclick="guardarRecibo()">Guardar</button>
+        <button onclick="modificarRecibo()" disabled>Modificar</button>
+        <button onclick="generarRecibo()">Generar</button>
+        <button onclick="pagar()">Pagar</button>
+        <button onclick="salir()">Salir</button>
+    </div>
+    <div id="resultado">
+        <h3>Detalles del Recibo</h3>
+        <p id="resultadoNombre"></p>
+        <p id="resultadoReferencia"></p>
+        <p id="resultadoConsumo"></p>
+        <p id="resultadoTotal"></p>
+        <button onclick="consultarValor()">Consultar</button>
+    </div>
+    <div id="pago">
+        <h3>Seleccione su tipo de pago:</h3>
+        <select id="tipoPago" onchange="mostrarCamposPago()">
+            <option value="">Seleccionar...</option>
+            <option value="tarjeta">Tarjeta de Crédito</option>
+            <option value="paypal">PayPal</option>
+            <option value="fisico">Pago Físico</option>
+        </select>
+        <div id="camposPago">
+            <label for="numeroCuenta">Número de cuenta:</label>
+            <input type="text" id="numeroCuenta" placeholder="Número de cuenta"><br>
+
+            <label for="contraseña">Contraseña:</label>
+            <input type="password" id="contraseña" placeholder="Contraseña"><br>
+
+            <button onclick="confirmarPago()">Pagar</button>
+        </div>
+    </div>
+    <div id="confirmacionPago">
+        <p>¡El recibo ha sido pagado exitosamente!</p>
+    </div>
+    <script>
+        let servicioSeleccionado = '';
+        function seleccionarServicio(servicio) {
+            servicioSeleccionado = servicio;
+            alert(`Servicio seleccionado: ${servicio.charAt(0).toUpperCase() + servicio.slice(1)}`);
+        }
+        function guardarRecibo() {
+            const nombre = document.getElementById("nombre").value;
+            const referencia = document.getElementById("referencia").value;
+            const consumo = document.getElementById("consumo").value;
+            if (nombre && referencia && consumo) {
+                localStorage.setItem('nombre', nombre);
+                localStorage.setItem('referencia', referencia);
+                localStorage.setItem('consumo', consumo);
+                localStorage.setItem('servicio', servicioSeleccionado);
+                document.getElementById("nombre").disabled = true;
+                document.getElementById("referencia").disabled = true;
+                document.getElementById("consumo").disabled = true;
+                document.querySelector("button[onclick='guardarRecibo()']").disabled = true;
+                document.querySelector("button[onclick='modificarRecibo()']").disabled = false;
+                alert("Recibo guardado correctamente.");
+            } else {
+                alert("Por favor, complete todos los campos antes de guardar.");
+            }
+        }
+        function modificarRecibo() {
+            document.getElementById("nombre").disabled = false;
+            document.getElementById("referencia").disabled = false;
+            document.getElementById("consumo").disabled = false;
+            document.querySelector("button[onclick='guardarRecibo()']").disabled = false;
+            document.querySelector("button[onclick='modificarRecibo()']").disabled = true;
+            alert("Campos habilitados para modificar.");
+        }
+        function generarRecibo() {
+            document.getElementById("resultado").style.display = "block";
+            document.getElementById("resultadoNombre").innerText = `Nombre: ${document.getElementById("nombre").value}`;
+            document.getElementById("resultadoReferencia").innerText = `Referencia: ${document.getElementById("referencia").value}`;
+            document.getElementById("resultadoConsumo").innerText = `Consumo: ${document.getElementById("consumo").value}`;
+        }
+        function consultarValor() {
+            const consumo = parseFloat(document.getElementById("consumo").value);
+            let total = 0;
+            switch (servicioSeleccionado) {
+                case 'agua':
+                    total = consumo * 730;
+                    break;
+                case 'gas':
+                    total = consumo * 710;
+                    break;
+                case 'energia':
+                    total = consumo * 536;
+                    break;
+                default:
+                    alert("Seleccione un servicio.");
+                    return;
+            }
+            document.getElementById("resultadoTotal").innerText = `Total a pagar: $${total.toFixed(2)}`;
+        }
+        function pagar() {
+            document.getElementById("pago").style.display = "block";
+        }
+        function mostrarCamposPago() {
+            const tipoPago = document.getElementById("tipoPago").value;
+            if (tipoPago === "tarjeta" || tipoPago === "paypal") {
+                document.getElementById("camposPago").style.display = "block";
+            } else {
+                document.getElementById("camposPago").style.display = "none";
+            }
+        }
+        function confirmarPago() {
+            const tipoPago = document.getElementById("tipoPago").value;
+            const numeroCuenta = document.getElementById("numeroCuenta").value;
+            const contraseña = document.getElementById("contraseña").value;
+            if (tipoPago && numeroCuenta && contraseña) {
+                document.getElementById("confirmacionPago").style.display = 'block';
+                alert("¡Pago realizado con éxito!");
+                document.getElementById("pago").style.display = "none";
+                document.querySelector("button[onclick='pagar()']").disabled = true;
+            } else {
+                alert("Por favor, complete todos los campos antes de pagar.");
+            }
+        }
+        function salir() {
+            alert("Saliendo de la aplicación...");
+            window.close();
+        }
+    </script>
+</body>
+</html>
